@@ -11,17 +11,15 @@ transaction_date = [0]
 transaction_bitcoin_price = [0]
 transaction_fee = [0]
 dca_amount = 4878
-dca_fee = dca_amount*.02
+dca_fee = dca_amount * .02
 
 with open('BITCOIN(06-2018-06-2022).csv', mode='r') as file:
     csv_reader = csv.reader(file)
-    # Skip the header row if there is one
     next(csv_reader)
     for row in csv_reader:
-        # Assuming the date is in the first column and price is in the second column
         date = row[0]
-        price = float(row[1])  # Convert price to float for numerical operations
-        # Store the date and price in the dictionary
+        price = float(row[1])
+
         price_dict[date] = price
 
 
@@ -51,6 +49,12 @@ def bitcoin_wallet_change(current_price):
     bitcoin_wallet.append(new_bitcoin_total)
 
 
+def update_lists(date):
+    transaction_date.append(date)
+    transaction_bitcoin_price.append(current_price(date))
+    transaction_fee.append(dca_fee)
+
+
 def results():
     df = pd.DataFrame({
         'transaction_date': transaction_date,
@@ -73,9 +77,7 @@ def main_iteration():
         date = date.strftime("%Y-%m-%d")
 
         if day % 7 == 0:
-            transaction_date.append(date)
-            transaction_bitcoin_price.append(current_price(date))
-            transaction_fee.append(dca_fee)
+            update_lists(date)
             cash_wallet_change()
             bitcoin_wallet_change(current_price(date))
             day += 1
