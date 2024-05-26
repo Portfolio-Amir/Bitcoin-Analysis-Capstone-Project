@@ -38,8 +38,7 @@ def last_week_price(current_date):
 def cash_wallet_change():
     global cash_wallet, dca_amount
     current_cash = cash_wallet[len(cash_wallet) - 1]
-    dca_amount_minus_fees = dca_amount - (dca_amount * 0.02)
-    new_cash_amount = current_cash - dca_amount_minus_fees
+    new_cash_amount = current_cash - dca_amount
     cash_wallet.append(new_cash_amount)
 
 
