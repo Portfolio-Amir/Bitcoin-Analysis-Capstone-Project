@@ -58,6 +58,10 @@ def cash_wallet_change(percent_change):
         transaction_fee.append(purchase_fee)
         return float(amount_to_buy * -1)
 
+def update_lists(date):
+    transaction_date.append(date)
+    transaction_bitcoin_price.append(current_price(date))
+
 
 def bitcoin_wallet_change(cash_wallet_change, current_price):
     global bitcoin_wallet
@@ -89,8 +93,7 @@ def main_iteration():
         date = date.strftime("%Y-%m-%d")
 
         if day % 7 == 0:
-            transaction_date.append(date)
-            transaction_bitcoin_price.append(current_price(date))
+            update_lists(date)
             bitcoin_wallet_change(cash_wallet_change(percent_change(current_price(date), last_week_price(date))),
                                   current_price(date))
             day += 1
