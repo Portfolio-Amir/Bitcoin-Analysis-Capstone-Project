@@ -36,15 +36,15 @@ def last_week_price(current_date):
 def cash_wallet_change():
     global cash_wallet, dca_amount
     current_cash = cash_wallet[len(cash_wallet) - 1]
-    new_cash_amount = current_cash - dca_amount
+    purchase_fee = dca_amount * 0.02
+    new_cash_amount = current_cash - dca_amount - purchase_fee
     cash_wallet.append(new_cash_amount)
 
 
 def bitcoin_wallet_change(current_price):
     global bitcoin_wallet, dca_amount
     current_bitcoin_owned = bitcoin_wallet[len(bitcoin_wallet) - 1]
-    dca_amount_minus_fees = dca_amount - (dca_amount * 0.02)
-    bitcoin_to_purchase = dca_amount_minus_fees / current_price
+    bitcoin_to_purchase = dca_amount / current_price
     new_bitcoin_total = current_bitcoin_owned + bitcoin_to_purchase
     bitcoin_wallet.append(new_bitcoin_total)
 

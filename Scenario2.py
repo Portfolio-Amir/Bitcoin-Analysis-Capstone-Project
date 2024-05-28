@@ -2,8 +2,8 @@ import csv
 import pandas as pd
 from datetime import datetime, timedelta
 
-# in this scenario, we'll be only buying based on the weekly percentage difference of bitcoin based on the cash we hold
-# e.g. bitcoin weekly change is 3% and have $100,000, we buy 3,000$ worth of bitcoin.
+# in this scenario, we'll be buying and selling based on the weekly percentage difference of bitcoin based on the cash we hold
+# e.g. bitcoin weekly change is 3% and have $100,000, we sell 3,000$ worth of bitcoin. we buy that amount if its -3%
 
 
 price_dict = {}
@@ -33,36 +33,34 @@ def last_week_price(current_date):
 
 
 def percent_change(current_price, last_week_price):
-    return ((current_price - last_week_price) / last_week_price)
+    return (current_price - last_week_price) / last_week_price
 
 
 def cash_wallet_change(percent_change):
-    global cash_wallet
-    if percent_change < 0:
-        current_cash = cash_wallet[len(cash_wallet) - 1]
-        amount_to_buy = current_cash * (percent_change*-1)
-        purchase_fee = amount_to_buy*.02
-        new_cash_amount = current_cash - (amount_to_buy + purchase_fee)
-        cash_wallet.append(new_cash_amount)
-        transaction_fee.append(purchase_fee)
-        return float(amount_to_buy)
+    global cash_wallet, transaction_fee
+    # if price goes up we sell bitcoin therefore gain money
+    current_cash = cash_wallet[len(cash_wallet) - 1]
+    amount_to_sell_or_buy = current_cash * percent_change
+    selling_fee = amount_to_sell_or_buy * .02
+    new_cash_amount = current_cash + amount_to_sell_or_buy - selling_fee
+    cash_wallet.append(new_cash_amount)
+    transaction_fee.append(selling_fee)
+    if float(amount_to_sell_or_buy) < 0:
+        return float(amount_to_sell_or_buy * -1)
     else:
-        cash_wallet.append(cash_wallet[len(cash_wallet)-1])
-        transaction_fee.append(0)
-        return 0
-
-
-def bitcoin_wallet_change(amount_to_buy, current_price):
-    global bitcoin_wallet
-    current_bitcoin_owned = bitcoin_wallet[len(bitcoin_wallet) - 1]
-    new_bitcoin_added = amount_to_buy / current_price
-    new_bitcoin_owned = current_bitcoin_owned + new_bitcoin_added
-    bitcoin_wallet.append(new_bitcoin_owned)
-
+        return float(amount_to_sell_or_buy)
 
 def update_lists(date):
     transaction_date.append(date)
     transaction_bitcoin_price.append(current_price(date))
+
+
+def bitcoin_wallet_change(cash_wallet_change, current_price):
+    global bitcoin_wallet
+    current_bitcoin_owned = bitcoin_wallet[len(bitcoin_wallet) - 1]
+    new_bitcoin_added = cash_wallet_change / current_price
+    new_bitcoin_owned = current_bitcoin_owned + new_bitcoin_added
+    bitcoin_wallet.append(new_bitcoin_owned)
 
 
 def results():
@@ -72,11 +70,10 @@ def results():
         'cash_wallet': cash_wallet,
         'bitcoin_price': transaction_bitcoin_price,
         'transaction_fee': transaction_fee
-
     })
     excel_file = 'results2018-2022.xlsx'
     with pd.ExcelWriter(excel_file, engine='openpyxl', mode='a') as writer:
-        df.to_excel(writer, sheet_name='Scenario2', index=False)
+        df.to_excel(writer, sheet_name='Scenario3', index=False)
 
 
 def main_iteration():
