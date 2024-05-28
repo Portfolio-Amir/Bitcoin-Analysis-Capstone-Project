@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 # in this scenario, we'll be buying and selling based on the weekly percentage difference of bitcoin based on the cash we hold
-# e.g bitcoin weekly change is 3% and have $100,000, we buy 3,000$ worth of bitcoin. we sell that amount if its -3%
+# e.g bitcoin weekly change is 3% and have $100,000, we sell 3,000$ worth of bitcoin. we buy that amount if its -3%
 
 
 price_dict = {}
@@ -39,14 +39,16 @@ def percent_change(current_price, last_week_price):
 def cash_wallet_change(percent_change):
     global cash_wallet, transaction_fee
     if percent_change > 0:
+        #if price goes up we sell bitcoin therefore gain money
         current_cash = cash_wallet[len(cash_wallet) - 1]
         amount_to_sell = current_cash * percent_change
         selling_fee = amount_to_sell * .02
-        new_cash_amount = current_cash - amount_to_sell - selling_fee
+        new_cash_amount = current_cash + amount_to_sell - selling_fee
         cash_wallet.append(new_cash_amount)
         transaction_fee.append(selling_fee)
         return float(amount_to_sell)
     else:
+        #if price goes down we buy bitcoin therefore we lose money
         current_cash = cash_wallet[len(cash_wallet) - 1]
         amount_to_buy = current_cash * (percent_change * -1)
         purchase_fee = amount_to_buy * .02

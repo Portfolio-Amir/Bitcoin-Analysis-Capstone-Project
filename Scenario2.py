@@ -60,6 +60,11 @@ def bitcoin_wallet_change(amount_to_buy, current_price):
     bitcoin_wallet.append(new_bitcoin_owned)
 
 
+def update_lists(date):
+    transaction_date.append(date)
+    transaction_bitcoin_price.append(current_price(date))
+
+
 def results():
     df = pd.DataFrame({
         'transaction_date': transaction_date,
@@ -83,8 +88,7 @@ def main_iteration():
         date = date.strftime("%Y-%m-%d")
 
         if day % 7 == 0:
-            transaction_date.append(date)
-            transaction_bitcoin_price.append(current_price(date))
+            update_lists(date)
             bitcoin_wallet_change(cash_wallet_change(percent_change(current_price(date), last_week_price(date))),
                                   current_price(date))
             day += 1

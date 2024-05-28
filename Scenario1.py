@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 # e.g. we have 1 bitcoin. weekly price change is +3% we sell 3% of our current holdings.
 # if weekly price change is -3%. we buy 3% worth of our current holdings.
 price_dict = {}
-bitcoin_wallet = [47.19764]
+bitcoin_wallet = [50]
 cash_wallet = [500000]
 transaction_date = [0]
 transaction_bitcoin_price = [0]
@@ -72,6 +72,11 @@ def cash_wallet_change(bitcoin_wallet_change, current_price):
         transaction_fee.append(purchase_fee)
 
 
+def update_lists(date):
+    transaction_date.append(date)
+    transaction_bitcoin_price.append(current_price(date))
+
+
 def results():
     df = pd.DataFrame({
         'transaction_date': transaction_date,
@@ -93,8 +98,7 @@ def main_iteration():
         date = date.strftime("%Y-%m-%d")
 
         if day % 7 == 0:
-            transaction_date.append(date)
-            transaction_bitcoin_price.append(current_price(date))
+            update_lists(date)
             cash_wallet_change(bitcoin_wallet_change(percent_change(current_price(date), last_week_price(date))),
                                current_price(date))
             day += 1
