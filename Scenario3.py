@@ -99,7 +99,6 @@ def main_iteration():
             day += 1
         else:
             day += 1
-    print(bitcoin_wallet)
     results()
 
 
