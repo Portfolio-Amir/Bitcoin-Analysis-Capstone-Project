@@ -13,7 +13,7 @@ transaction_date = [0]
 transaction_bitcoin_price = [0]
 transaction_fee = [0]
 
-with open('BITCOIN(06-2018-06-2022).csv', mode='r') as file:
+with open('BITCOIN(05-2020-04-2024).csv', mode='r') as file:
     csv_reader = csv.reader(file)
     next(csv_reader)
     for row in csv_reader:
@@ -71,7 +71,7 @@ def results():
         'bitcoin_price': transaction_bitcoin_price,
         'transaction_fee': transaction_fee
     })
-    excel_file = 'results2018-2022.xlsx'
+    excel_file = 'results(2020-2024).xlsx'
     with pd.ExcelWriter(excel_file, engine='openpyxl', mode='a') as writer:
         df.to_excel(writer, sheet_name='Scenario3', index=False)
 
