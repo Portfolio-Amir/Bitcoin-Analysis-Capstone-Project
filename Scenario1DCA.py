@@ -58,7 +58,7 @@ def scenario1DCA(filename):
             'bitcoin_wallet': bitcoin_wallet,
             'cash_wallet': cash_wallet,
             'bitcoin_price': transaction_bitcoin_price,
-            'transaction_fee': transaction_fee
+            'transaction_fee': transaction_fee,
         })
         change_directory = filename.replace('Price_History', "Results")
         excel_file = change_directory.replace(".csv", "Results.xlsx")
@@ -79,9 +79,9 @@ def scenario1DCA(filename):
             date = date.strftime("%Y-%m-%d")
 
             if day % 7 == 0:
-                update_lists(date)
                 cash_wallet_change()
                 bitcoin_wallet_change(current_price(date))
+                update_lists(date)
                 day += 1
             else:
                 day += 1
