@@ -37,8 +37,8 @@ def scenario3(filename):
 
     def cash_wallet_change(percent_change):
         global cash_wallet
+        current_cash = cash_wallet[len(cash_wallet) - 1]
         if percent_change < 0:
-            current_cash = cash_wallet[len(cash_wallet) - 1]
             amount_to_buy = current_cash * (percent_change * -1)
             purchase_fee = amount_to_buy * .02
             new_cash_amount = current_cash - (amount_to_buy + purchase_fee)

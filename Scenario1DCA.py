@@ -11,8 +11,7 @@ cash_wallet = [1000000]
 transaction_date = [0]
 transaction_bitcoin_price = [0]
 transaction_fee = [0]
-dca_amount = 4878
-dca_fee = dca_amount * .02
+
 
 
 def scenario1DCA(filename):
@@ -22,26 +21,25 @@ def scenario1DCA(filename):
         for row in csv_reader:
             date = row[0]
             price = float(row[1])
-
             price_dict[date] = price
 
     def current_price(current_date):
         return float(price_dict[current_date])
 
-    def last_week_price(current_date):
-        start_date = datetime.strptime(current_date, "%Y-%m-%d")
-        last_week_date = start_date + timedelta(days=-7)
-        return price_dict[last_week_date.strftime("%Y-%m-%d")]
-
     def cash_wallet_change():
-        global cash_wallet, dca_amount
+        global cash_wallet
         current_cash = cash_wallet[len(cash_wallet) - 1]
+        number_of_weeks = len(price_dict)/7
+        dca_amount = cash_wallet[0] / number_of_weeks
         purchase_fee = dca_amount * 0.02
+        transaction_fee.append(purchase_fee)
         new_cash_amount = current_cash - dca_amount - purchase_fee
         cash_wallet.append(new_cash_amount)
 
     def bitcoin_wallet_change(current_price):
-        global bitcoin_wallet, dca_amount
+        global bitcoin_wallet
+        number_of_weeks = len(price_dict)/6
+        dca_amount = cash_wallet[0] / number_of_weeks
         current_bitcoin_owned = bitcoin_wallet[len(bitcoin_wallet) - 1]
         bitcoin_to_purchase = dca_amount / current_price
         new_bitcoin_total = current_bitcoin_owned + bitcoin_to_purchase
@@ -50,7 +48,6 @@ def scenario1DCA(filename):
     def update_lists(date):
         transaction_date.append(date)
         transaction_bitcoin_price.append(current_price(date))
-        transaction_fee.append(dca_fee)
 
     def results():
         df = pd.DataFrame({

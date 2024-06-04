@@ -13,6 +13,9 @@ cash_wallet = [1000000]
 transaction_date = [0]
 transaction_bitcoin_price = [0]
 transaction_fee = [0]
+bitcoin_change = [0]
+cash_change = [0]
+percent_changes = [0]
 
 
 def scenario2(filename):
@@ -35,16 +38,22 @@ def scenario2(filename):
     def percent_change(current_price, last_week_price):
         return (current_price - last_week_price) / last_week_price
 
-    def cash_wallet_change(percent_change):
-        global cash_wallet, transaction_fee
-        # if price goes up we sell bitcoin therefore gain money
-        current_cash = cash_wallet[len(cash_wallet) - 1]
-        amount_to_sell_or_buy = current_cash * percent_change
+    def selling_fees(amount_to_sell_or_buy):
         if amount_to_sell_or_buy < 0:
             selling_fee = amount_to_sell_or_buy * .02 * -1
         else:
             selling_fee = amount_to_sell_or_buy * .02
+        return float(selling_fee)
+
+    def cash_wallet_change(percent_change):
+        global cash_wallet, transaction_fee
+        # if price goes up we sell bitcoin therefore gain money by taking profit
+        current_cash = cash_wallet[len(cash_wallet) - 1]
+        amount_to_sell_or_buy = current_cash * percent_change
+        selling_fee = selling_fees(amount_to_sell_or_buy)
         new_cash_amount = current_cash + amount_to_sell_or_buy - selling_fee
+        percent_changes.append(percent_change)
+        cash_change.append(amount_to_sell_or_buy)
         cash_wallet.append(new_cash_amount)
         transaction_fee.append(selling_fee)
         return amount_to_sell_or_buy
@@ -56,9 +65,23 @@ def scenario2(filename):
     def bitcoin_wallet_change(cash_wallet_change, current_price):
         global bitcoin_wallet
         current_bitcoin_owned = bitcoin_wallet[len(bitcoin_wallet) - 1]
-        new_bitcoin_added = cash_wallet_change / current_price
-        new_bitcoin_owned = current_bitcoin_owned + new_bitcoin_added
-        bitcoin_wallet.append(new_bitcoin_owned)
+        if cash_wallet_change > 0:
+            new_bitcoin_change = cash_wallet_change / current_price * -1
+            new_bitcoin_owned = current_bitcoin_owned - new_bitcoin_change
+            if new_bitcoin_owned < 0:
+                cash_wallet.pop()
+                cash_wallet.append(cash_wallet[len(cash_wallet)-1])
+                bitcoin_wallet.append(bitcoin_wallet[len(bitcoin_wallet)-1])
+                bitcoin_change.append(0)
+            else:
+                bitcoin_wallet.append(new_bitcoin_owned)
+                bitcoin_change.append(new_bitcoin_change)
+        else:
+            new_bitcoin_change = cash_wallet_change / current_price
+            bitcoin_change.append(new_bitcoin_change)
+            new_bitcoin_owned = current_bitcoin_owned + new_bitcoin_change
+            bitcoin_wallet.append(new_bitcoin_owned)
+
 
     def results():
         df = pd.DataFrame({
@@ -66,7 +89,10 @@ def scenario2(filename):
             'bitcoin_wallet': bitcoin_wallet,
             'cash_wallet': cash_wallet,
             'bitcoin_price': transaction_bitcoin_price,
-            'transaction_fee': transaction_fee
+            'percent_changes': percent_changes,
+            'transaction_fee': transaction_fee,
+            'bitcoin_change': bitcoin_change,
+            'cash_change': cash_change,
         })
         change_directory = filename.replace('Price_History', "Results")
         excel_file = change_directory.replace(".csv", "Results.xlsx")
