@@ -10,12 +10,13 @@ import os
 price_dict = {}
 bitcoin_wallet = [0]
 cash_wallet = [1000000]
-transaction_date = [0]
-transaction_bitcoin_price = [0]
-transaction_fee = [0]
-bitcoin_change = [0]
-cash_change = [0]
-percent_changes = [0]
+transaction_date = ['']
+transaction_bitcoin_price = ['']
+transaction_fee = ['']
+bitcoin_change = ['']
+cash_change = ['']
+percent_changes = ['']
+net_worth = [cash_wallet[0]]
 
 
 def scenario2(filename):
@@ -66,7 +67,7 @@ def scenario2(filename):
                 amount_to_buy = money_owned_currently * percent_change * -1
                 new_money_owned = money_owned_currently - amount_to_buy
                 cash_wallet.append(new_money_owned)
-                cash_change.append(amount_to_buy)
+                cash_change.append(-amount_to_buy)
                 percent_changes.append(percent_change)
             else:
                 # if price goes up we take profit and sell, which means our money will go up
@@ -108,7 +109,7 @@ def scenario2(filename):
                 amount_to_sell_bitcoin = (amount_to_sell_dollars - network_fee) / current_price
                 new_bitcoin_holding = bitcoin_currently_owned - amount_to_sell_bitcoin
                 bitcoin_wallet.append(new_bitcoin_holding)
-                bitcoin_change.append(amount_to_sell_bitcoin)
+                bitcoin_change.append(-amount_to_sell_bitcoin)
                 transaction_fee.append(network_fee)
         else:
             # if our bitcoin or cash will dip below 0 with action than we don't do anything and fill our lists
@@ -130,10 +131,11 @@ def scenario2(filename):
             'bitcoin_wallet': bitcoin_wallet,
             'cash_wallet': cash_wallet,
             'bitcoin_price': transaction_bitcoin_price,
-            'percent_changes': percent_changes,
             'transaction_fee': transaction_fee,
+            'percent_changes': percent_changes,
             'bitcoin_change': bitcoin_change,
-            'cash_change': cash_change
+            'cash_change': cash_change,
+            'net_worth': net_worth
         })
         change_directory = filename.replace('Price_History', "Results")
         excel_file = change_directory.replace(".csv", "Results.xlsx")
@@ -156,6 +158,8 @@ def scenario2(filename):
                 bitcoin_wallet_change(percent_change(current_price(date), last_week_price(date)), current_price(date))
                 cash_wallet_change(percent_change(current_price(date), last_week_price(date)), current_price(date))
                 update_lists(date)
+                total_assets_in_dollars = bitcoin_wallet[len(bitcoin_wallet)-1] * current_price(date) + cash_wallet[len(cash_wallet)-1]
+                net_worth.append(total_assets_in_dollars)
                 day += 1
             else:
                 day += 1

@@ -8,12 +8,12 @@ import os
 price_dict = {}
 bitcoin_wallet = [0]
 cash_wallet = [1000000]
-transaction_date = [0]
-transaction_bitcoin_price = [0]
-transaction_fee = [0]
-bitcoin_change = [0]
-cash_change = [0]
-
+transaction_date = ['']
+transaction_bitcoin_price = ['']
+transaction_fee = ['']
+bitcoin_change = ['']
+cash_change = ['']
+net_worth = [cash_wallet[0]]
 
 def scenario1dca(filename):
     with open(filename, mode='r') as file:
@@ -67,6 +67,9 @@ def scenario1dca(filename):
             'cash_wallet': cash_wallet,
             'bitcoin_price': transaction_bitcoin_price,
             'transaction_fee': transaction_fee,
+            'bitcoin_change': bitcoin_change,
+            'cash_change': cash_change,
+            'net_worth': net_worth
         })
         change_directory = filename.replace('Price_History', "Results")
         excel_file = change_directory.replace(".csv", "Results.xlsx")
@@ -91,6 +94,8 @@ def scenario1dca(filename):
                 cash_wallet_change()
                 bitcoin_wallet_change(current_price(date))
                 update_lists(date)
+                total_assets_in_dollars = bitcoin_wallet[len(bitcoin_wallet)-1] * current_price(date) + cash_wallet[len(cash_wallet)-1]
+                net_worth.append(total_assets_in_dollars)
                 day += 1
             else:
                 day += 1
