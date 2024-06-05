@@ -132,10 +132,10 @@ def scenario2(filename):
             'cash_wallet': cash_wallet,
             'bitcoin_price': transaction_bitcoin_price,
             'transaction_fee': transaction_fee,
-            'percent_changes': percent_changes,
             'bitcoin_change': bitcoin_change,
             'cash_change': cash_change,
-            'net_worth': net_worth
+            'net_worth': net_worth,
+            'percent_changes': percent_changes
         })
         change_directory = filename.replace('Price_History', "Results")
         excel_file = change_directory.replace(".csv", "Results.xlsx")
