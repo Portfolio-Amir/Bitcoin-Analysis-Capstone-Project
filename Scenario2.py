@@ -20,6 +20,7 @@ percent_changes = [0]
 
 def scenario2(filename):
     with open(filename, mode='r') as file:
+        # takes input file name and opens the data that will be used
         csv_reader = csv.reader(file)
         next(csv_reader)
         for row in csv_reader:
@@ -28,14 +29,17 @@ def scenario2(filename):
             price_dict[date] = price
 
     def current_price(current_date):
+        # returns bitcoin price at date given
         return float(price_dict[current_date])
 
     def last_week_price(current_date):
+        # find the price of bitcoin a week before given date
         start_date = datetime.strptime(current_date, "%Y-%m-%d")
         last_week_date = start_date + timedelta(days=-7)
         return price_dict[last_week_date.strftime("%Y-%m-%d")]
 
     def percent_change(current_price, last_week_price):
+        # give the percent change of current price and last week's price as a float
         return (current_price - last_week_price) / last_week_price
 
     def is_asset_enough(percent_change, current_price):
@@ -73,7 +77,7 @@ def scenario2(filename):
                 cash_change.append(amount_to_sell)
                 percent_changes.append(percent_change)
         else:
-            # if our bitcoin or cash will dip below 0 with action than we dont do anything and fill our lists
+            # if our bitcoin or cash will dip below 0 with action than we don't do anything and fill our lists
             # accordingly
             cash_wallet.append(cash_wallet[len(cash_wallet) - 1])
             cash_change.append(0)
@@ -114,10 +118,13 @@ def scenario2(filename):
             transaction_fee.append(0)
 
     def update_lists(date):
+        # adds additional info to lists based on date given to analyze later
         transaction_date.append(date)
         transaction_bitcoin_price.append(current_price(date))
 
     def results():
+        # creates a dataframe of the lists we want to analyze, makes new sheet for current simulation in given excel
+        # file and exports dataframe into it
         df = pd.DataFrame({
             'transaction_date': transaction_date,
             'bitcoin_wallet': bitcoin_wallet,
@@ -139,8 +146,7 @@ def scenario2(filename):
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
 
     def main_iteration():
-        global purchases, transaction_date, transaction_bitcoin_price
-
+        # Loop that runs through the given data set and runs the simulation functions on each 7th day.
         day = 1
         for date in sorted(price_dict):
             date = datetime.strptime(date, "%Y-%m-%d") + timedelta(days=+1)

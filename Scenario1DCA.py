@@ -11,11 +11,13 @@ cash_wallet = [1000000]
 transaction_date = [0]
 transaction_bitcoin_price = [0]
 transaction_fee = [0]
+bitcoin_change = [0]
+cash_change = [0]
 
 
-
-def scenario1DCA(filename):
+def scenario1dca(filename):
     with open(filename, mode='r') as file:
+        # takes input file name and opens the data that will be used
         csv_reader = csv.reader(file)
         next(csv_reader)
         for row in csv_reader:
@@ -24,32 +26,41 @@ def scenario1DCA(filename):
             price_dict[date] = price
 
     def current_price(current_date):
+        # returns bitcoin price at date given
         return float(price_dict[current_date])
 
     def cash_wallet_change():
+        # simulates a purchase from cash wallet reducing dca amount each time it is run
         global cash_wallet
         current_cash = cash_wallet[len(cash_wallet) - 1]
-        number_of_weeks = len(price_dict)/7
+        number_of_weeks = len(price_dict) / 7
         dca_amount = cash_wallet[0] / number_of_weeks
         purchase_fee = dca_amount * 0.02
         transaction_fee.append(purchase_fee)
-        new_cash_amount = current_cash - dca_amount - purchase_fee
+        new_cash_amount = current_cash - dca_amount
         cash_wallet.append(new_cash_amount)
+        cash_change.append(-dca_amount)
 
     def bitcoin_wallet_change(current_price):
+        # simulates a purchase on bitcoin wallet adding dca amount worth in bitcoin at the price given each time it is run
         global bitcoin_wallet
-        number_of_weeks = len(price_dict)/6
+        number_of_weeks = len(price_dict) / 6
         dca_amount = cash_wallet[0] / number_of_weeks
+        network_fee = dca_amount * 0.02
         current_bitcoin_owned = bitcoin_wallet[len(bitcoin_wallet) - 1]
-        bitcoin_to_purchase = dca_amount / current_price
+        bitcoin_to_purchase = (dca_amount - network_fee) / current_price
         new_bitcoin_total = current_bitcoin_owned + bitcoin_to_purchase
         bitcoin_wallet.append(new_bitcoin_total)
+        bitcoin_change.append(bitcoin_to_purchase)
 
     def update_lists(date):
+        # adds additional info to lists based on date given to analyze later
         transaction_date.append(date)
         transaction_bitcoin_price.append(current_price(date))
 
     def results():
+        # creates a dataframe of the lists we want to analyze, makes new sheet for current simulation in given excel
+        # file and exports dataframe into it
         df = pd.DataFrame({
             'transaction_date': transaction_date,
             'bitcoin_wallet': bitcoin_wallet,
@@ -68,6 +79,7 @@ def scenario1DCA(filename):
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
 
     def main_iteration():
+        # Loop that runs through the given data set and runs the simulation functions on each 7th day.
         global purchases, transaction_date, transaction_bitcoin_price
 
         day = 1
